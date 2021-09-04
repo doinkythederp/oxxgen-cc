@@ -1,2 +1,8 @@
-const Tag = require('./dist/index');
-console.log(new Tag.Runtime(Tag.interpretTemplateString('123 {randomNum}')).start())
+const { Repl } = require('.');
+const repl = new Repl();
+repl.open();
+
+process.once('SIGINT', () => {
+  repl.close();
+  process.exit();
+});

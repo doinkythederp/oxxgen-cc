@@ -1,5 +1,6 @@
 import { ReadLine, createInterface } from 'readline';
-import { TypedEventEmitter } from './TypedEventEmitter';
+import { interpretTemplateString } from './interpreters/TemplateString';
+import { Runtime, ContextData } from './Runtime';
 
 export interface ReplOptions {
   /** Defaults to `process.stdin` */
@@ -10,29 +11,34 @@ export interface ReplOptions {
 
   /** Defaults to `"> "` */
   prompt?: string;
+
+  /** Defaults to an empty object */
+  context?: ContextData;
 }
 
-export interface ReplEvents {
-  open: () => void;
-  close: () => void;
-  : () => void;
-}
-
-export class Repl extends TypedEventEmitter<ReplEvents> {
+export class Repl {
   constructor(options: ReplOptions = {}) {
-    super();
     this.options = Object.assign({}, Repl.defaultOptions, options);
   }
 
   /** Opens the repl interface */
   open(): this {
     if (this.rl) return this;
-    this.rl = createInterface(this.options)
-      .on('line', (input) => {
+    const rl = createInterface(this.options)
+      .on('line', async (input) => {
+        try {
+          const compiled = interpretTemplateString(input, { fullSourceCode: input, globalIndex: 0 });
+          const runtime = new Runtime(compiled, { context: this.options.context });
+          console.log(runtime.start());
+        } catch(err) {
+          console.log(err?.stack ?? err);
+        }
 
+        rl.prompt();
       });
-    this.rl.prompt();
+    rl.prompt();
 
+    this.rl = rl;
     return this;
   }
 
@@ -47,9 +53,10 @@ export class Repl extends TypedEventEmitter<ReplEvents> {
   static defaultOptions: Required<ReplOptions> = {
     input: process.stdin,
     output: process.stdout,
-    prompt: '> '
+    prompt: '> ',
+    context: {}
   }
 
-  private rl: ReadLine | null = null;
+  rl: ReadLine | null = null;
   readonly options: Required<ReplOptions>;
 }

@@ -3,16 +3,17 @@ import * as Tree from './Tree';
 type Node = Tree.TextLiteralNode | Tree.SingleQuoteStringNode | Tree.DoubleQuoteStringNode | Tree.CommentTagNode | Tree.TemplateStringNode | Tree.VariableDeclarationTagNode | Tree.TagNode;
 export type TagHandler = (context: Context, ...args: string[]) => string;
 export type Context = Map<string, TagHandler>;
+export type ContextData = { [tagName: string]: TagHandler };
 
 export interface RuntimeOptions {
   /** Tag methods to include */
-  context?: { [tagName: string]: TagHandler };
+  context?: ContextData;
 
   /** Maximum execution time before cancelling */
   timeout?: number;
 }
 
-namespace BuiltInTags {
+export namespace BuiltInTags {
   /** Joins strings together with the specified seperator */
   export function join(_context: Context, seperator?: string, ...args: string[]): string {
     if (!seperator) throw new TypeError('Must provide a seperator');
