@@ -21,5 +21,8 @@
   },
   "bin": {
     "occ": "dist/cli.js"
-  }
+  },
+  "files": [
+    "dist/"
+  ]
 }
