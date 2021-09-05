@@ -1,7 +1,7 @@
 import * as Tree from './Tree';
 
 type Node = Tree.TextLiteralNode | Tree.SingleQuoteStringNode | Tree.DoubleQuoteStringNode | Tree.CommentTagNode | Tree.TemplateStringNode | Tree.VariableDeclarationTagNode | Tree.TagNode;
-export type TagHandler = (context: Context, ...args: string[]) => string;
+export type TagHandler = (this: Context, ...args: string[]) => string;
 export type Context = Map<string, TagHandler>;
 export type ContextData = { [tagName: string]: TagHandler };
 
@@ -15,19 +15,19 @@ export interface RuntimeOptions {
 
 export namespace BuiltInTags {
   /** Joins strings together with the specified seperator */
-  export function join(_context: Context, seperator?: string, ...args: string[]): string {
+  export function join(seperator?: string, ...args: string[]): string {
     if (!seperator) throw new TypeError('Must provide a seperator');
     return args.join(seperator);
   }
   
   /** Returns a random argument */
-  export function random(_context: Context, ...args: string[]): string {
+  export function random(...args: string[]): string {
     if (!args.length) throw new TypeError('Must provide arguments to choose from');
     return args[Math.floor(Math.random() * args.length)];
   }
   
   /** Returns a random number */
-  export function randomNumber(_context: Context, from?: string, to?: string): string {
+  export function randomNumber(from?: string, to?: string): string {
     if (from !== undefined && to === undefined) throw new TypeError('If a "from" argument is provided, a "to" one must be as well.');
 
     let [fromNum, toNum] = (from !== undefined && to !== undefined) ? [parseFloat(from), parseFloat(to)] : [0, 99];
@@ -70,7 +70,7 @@ export class Runtime {
       case Tree.NodeType.TAG:
         let method = this.context.get(node.method);
         if (!method) throw new ReferenceError(node.method + ' is not defined');
-        let result = String(method(this.context, ...node.children.map((node) => this.runNode(node as Node, cancelDate))));
+        let result = String(method.call(this.context, ...node.children.map((node) => this.runNode(node as Node, cancelDate))));
         this.checkCancelNeeded(cancelDate);
         return result;
 
