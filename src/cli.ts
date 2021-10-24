@@ -12,13 +12,13 @@ const program = new Command('occ')
       try {
         const file = await readFile(fileName, 'utf8');
         process.stdout.write(runTemplate(file));
-      } catch(err) {
+      } catch(err: any) {
         console.error(err?.stack ?? err);
       }
     } else if (options.eval) {
       try {
         console.log(runTemplate(options.eval));
-      } catch(err) {
+      } catch(err: any) {
         console.error(err?.stack ?? err);
       }
     } else {

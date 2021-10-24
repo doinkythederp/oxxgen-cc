@@ -30,7 +30,7 @@ export class Repl {
           const compiled = interpretTemplateString(input, { fullSourceCode: input, globalIndex: 0 });
           const runtime = new Runtime(compiled, { context: this.options.context });
           console.log(runtime.start());
-        } catch(err) {
+        } catch(err: any) {
           console.log(err?.stack ?? err);
         }
 
