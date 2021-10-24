@@ -1,5 +1,5 @@
 {
-  "name": "oxxgen-cc",
+  "name": "@doinkythederp/oxxgen-cc",
   "version": "0.1.0",
   "description": "",
   "main": "dist/index.js",
@@ -24,5 +24,8 @@
   },
   "files": [
     "dist/"
-  ]
+  ],
+  "publishConfig": {
+    "@doinkythederp:registry": "https://npm.pkg.github.com/"
+  }
 }
